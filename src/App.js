@@ -1,6 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
 import mapboxgl from 'mapbox-gl'; // or "const mapboxgl = require('mapbox-gl');"
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoid2FxdXR0cm8iLCJhIjoiY2thN3FicnkzMDZwcjJycWQzNTBuYW5tOSJ9.5cuZ0Th6f_KjECCIyvGANg';
@@ -34,12 +39,25 @@ class App extends React.Component {
 
   render() {
     return (
-        <div>
-          <div className='sidebarStyle'>
-            <div>Longitude: {this.state.lng} | Latitude: {this.state.lat} | Zoom: {this.state.zoom}</div>
-          </div>
-          <div ref={el => this.mapContainer = el} className='mapContainer' />
-        </div>
+      <Container>
+        <Row>
+          <Col md={2}>
+            <div className='sidebarStyle'>
+              <div>Longitude: {this.state.lng} | Latitude: {this.state.lat} | Zoom: {this.state.zoom}</div>
+            </div>
+          </Col>
+          <Col md={8}>
+            <div ref={el => this.mapContainer = el} className='mapContainer' />
+          </Col>
+          <Col md={2}>
+            <Form.Check
+              type={'checkbox'}
+              id={`default-${'checkbox'}`}
+              label={`default ${'checkbox'}`}
+            />
+          </Col>
+        </Row>
+      </Container>
     )
   }
 }
