@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import mapboxgl from 'mapbox-gl'; // or "const mapboxgl = require('mapbox-gl');"
+import * as dataForge from 'data-forge';
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoid2FxdXR0cm8iLCJhIjoiY2thN3FicnkzMDZwcjJycWQzNTBuYW5tOSJ9.5cuZ0Th6f_KjECCIyvGANg';
 
@@ -18,6 +19,35 @@ class App extends React.Component {
       lat: 34,
       zoom: 2
     };
+    this.df_enkan_latlon = null;
+    this.df_data_enkans = null;
+
+    this.readCSV();
+  }
+
+  async readCSV() {
+    await this.read_enkan_latlon();
+    await this.read_data_enkans();
+  }
+
+  async read_enkan_latlon() {
+    fetch('./enkan_latlon_GSI.csv')
+      .then(response => {
+        response.text().then(text => {
+          this.df_enkan_latlon = dataForge.fromCSV(text);
+          console.log(this.df_enkan_latlon.toCSV());
+        });
+      });
+  }
+
+  async read_data_enkans() {
+    fetch('./JAZA_data_enkans.csv')
+      .then(response => {
+        response.text().then(text => {
+          this.df_data_enkans = dataForge.fromCSV(text);
+          console.log(this.df_data_enkans.toCSV());
+        });
+      });
   }
 
   componentDidMount() {
