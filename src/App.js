@@ -17,14 +17,16 @@ const FILE_data_enkans = "./JAZA_data_enkans.csv";
 class App extends React.Component {
   constructor(props) {
     super(props);
+
+    this.SELECT_ALL = "＜全て＞";
+
     this.state = {
       lng: 138,
       lat: 37,
       zoom: 3.5,
-      isFileLoaded: false,
       dropdownPlace: [],
-      dropdownPlaceSelected: "すべて",
-      checkboxPenguin: new Map(),
+      dropdownPlaceSelected: this.SELECT_ALL,
+      checkboxPenguin: new Map().set(this.SELECT_ALL, true),
     };
 
     this.map = null;
@@ -38,60 +40,55 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // ファイル読み込み
-    Promise.all([this.read_enkan_latlon(), this.read_data_enkans()]).then(
-      () => {
-        this.setState({ isFileLoaded: true });
-      }
-    );
-
     this.createMap();
+    // ファイル読み込み
+    this.read_enkan_latlon();
+    this.read_data_enkans();
   }
 
   render() {
     let checkboxPenguin; // チェックボックス（ペンギン）
     let dropdownPlace; // ドロップダウンリスト（動物園・水族館名）
 
-    if (this.state.isFileLoaded) {
-      // ドロップダウンリスト（動物園・水族館）を用意する
-      dropdownPlace = (
-        <Form>
-          <Form.Group controlId="exampleForm.SelectCustom">
-            <Form.Label>動物園・水族館</Form.Label>
-            <Form.Control
-              as="select"
-              custom
-              value={this.state.dropdownPlaceSelected}
-              onChange={this.dropdownPlaceChanged}
-            >
-              {this.state.dropdownPlace.map((item) => (
-                <option value={item}>{item}</option>
-              ))}
-            </Form.Control>
-          </Form.Group>
-        </Form>
-      );
+    // ドロップダウンリスト（動物園・水族館）を用意する
+    dropdownPlace = (
+      <Form>
+        <Form.Group controlId="exampleForm.SelectCustom">
+          <Form.Label>動物園・水族館</Form.Label>
+          <Form.Control
+            as="select"
+            custom
+            value={this.state.dropdownPlaceSelected}
+            onChange={this.dropdownPlaceChanged}
+          >
+            {this.state.dropdownPlace.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </Form.Control>
+        </Form.Group>
+      </Form>
+    );
 
-      // チェックボックス（ペンギン）を用意する
-      console.log(Array.from(this.state.checkboxPenguin.values()));
-      checkboxPenguin = (
-        <Form>
-          {Array.from(this.state.checkboxPenguin.keys()).map((key) => {
-            const checked = this.state.checkboxPenguin.get(key);
-            return (
-              <Form.Check
-                key={key}
-                value={key}
-                type="checkbox"
-                checked={checked}
-                label={key.replace("ペンギン", "")}
-                onChange={this.checkboxPenguinChanged}
-              />
-            );
-          })}
-        </Form>
-      );
-    }
+    // チェックボックス（ペンギン）を用意する
+    checkboxPenguin = (
+      <Form>
+        {Array.from(this.state.checkboxPenguin.keys()).map((key) => {
+          const checked = this.state.checkboxPenguin.get(key);
+          return (
+            <Form.Check
+              key={key}
+              value={key}
+              type="checkbox"
+              checked={checked}
+              label={key.replace("ペンギン", "")}
+              onChange={this.checkboxPenguinChanged}
+            />
+          );
+        })}
+      </Form>
+    );
 
     return (
       <Container>
@@ -140,8 +137,8 @@ class App extends React.Component {
       .toArray();
 
     // ドロップダウンリストの状態を初期化
-    this.state.dropdownPlace = ["すべて", ...this.places];
-    this.state.dropdownPlaceSelected = "すべて";
+    this.setState({ dropdownPlace: [this.SELECT_ALL, ...this.places] });
+    this.setState({ dropdownPlaceSelected: this.SELECT_ALL });
   }
 
   /**
@@ -160,10 +157,10 @@ class App extends React.Component {
       .toArray();
 
     // チェックボックスの状態を初期化
-    this.state.checkboxPenguin.set("すべて", true);
-    for (let penguin of this.penguins) {
-      this.state.checkboxPenguin.set(penguin, true);
-    }
+    const box = new Map();
+    box.set(this.SELECT_ALL, true);
+    for (let penguin of this.penguins) box.set(penguin, true);
+    this.setState({ checkboxPenguin: box });
   }
 
   /**
@@ -179,14 +176,14 @@ class App extends React.Component {
 
     // load時の処理を登録
     this.map.on("load", () => {
-      this.map.addSource("place", {
+      this.map.addSource("source-place", {
         type: "geojson",
         data: FILE_GeoJSON,
       });
       this.map.addLayer({
-        id: "place",
+        id: "layer-place",
         type: "circle",
-        source: "place",
+        source: "source-place",
         layout: {},
         paint: {
           "circle-stroke-width": 1,
@@ -204,6 +201,20 @@ class App extends React.Component {
           ],
         },
       });
+      this.map.addLayer({
+        id: "layer-place-label",
+        type: "symbol",
+        source: "source-place",
+        layout: {
+          "text-field": ["format", ["get", "place"]],
+          "text-anchor": "bottom",
+          "text-radial-offset": 0.7,
+        },
+        paint: {
+          "text-halo-width": 2,
+          "text-halo-color": "rgba(255, 255, 255, 255)",
+        },
+      });
     });
 
     // move時の処理を登録
@@ -214,6 +225,40 @@ class App extends React.Component {
         zoom: this.map.getZoom(),
       });
     });
+
+    // Create a popup, but don't add it to the map yet.
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+    });
+
+    this.map.on("mouseenter", "layer-place", (e) => {
+      // Change the cursor style as a UI indicator.
+      this.map.getCanvas().style.cursor = "pointer";
+
+      const coordinates = e.features[0].geometry.coordinates.slice();
+
+      const penguins = e.features[0].properties.penguin.split("_");
+      const penguinsHTML = "<ul>" + penguins.map(x => "<li>" + x + "</li>").join("") + "</ul>"
+      const placeHTML = "<h6>" + e.features[0].properties.place + "</h6>";
+      const description = placeHTML + penguinsHTML;
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      // Populate the popup and set its coordinates
+      // based on the feature found.
+      popup.setLngLat(coordinates).setHTML(description).addTo(this.map);
+    });
+
+    this.map.on("mouseleave", "layer-place", () => {
+      this.map.getCanvas().style.cursor = "";
+      popup.remove();
+    });
   }
 
   /**
@@ -221,17 +266,20 @@ class App extends React.Component {
    * @param {*} event
    */
   dropdownPlaceChanged(event) {
-    const selected = event.target.value;
-    this.setState({ dropdownPlaceSelected: selected });
+    const item = event.target.value;
 
     // マップにフィルタを適用
     if (this.map.loaded()) {
-      if (selected === "すべて") {
-        this.map.setFilter("place", null);
+      if (item === this.SELECT_ALL) {
+        this.map.setFilter("layer-place", null);
+        this.map.setFilter("layer-place-label", null);
       } else {
-        this.map.setFilter("place", ["==", ["get", "place"], selected]);
+        this.map.setFilter("layer-place", ["==", ["get", "place"], item]);
+        this.map.setFilter("layer-place-label", ["==", ["get", "place"], item]);
       }
     }
+
+    this.setState({ dropdownPlaceSelected: item });
   }
 
   /**
@@ -239,32 +287,45 @@ class App extends React.Component {
    * @param {*} event
    */
   checkboxPenguinChanged(event) {
-    const state = this.state.checkboxPenguin;
-    state.set(event.target.value, !state.get(event.target.value));
-    if (event.target.value === "すべて") {
-      state.forEach((val, key) => {
-        state.set(key, event.target.checked);
-      });
-    }
-    this.setState({ checkboxPenguin: state });
+    // 状態を更新
+    const boxState = this.state.checkboxPenguin;
+    const item = event.target.value;
+    const check = event.target.checked;
+    boxState.set(item, !boxState.get(item));
+    if (item === this.SELECT_ALL)
+      for (let key of boxState.keys()) boxState.set(key, check);
+    else if (check) {
+      let isAllChecked = true;
+      for (let [key, val] of boxState)
+        if (key !== this.SELECT_ALL && val === false) {
+          isAllChecked = false;
+          break;
+        }
+      if (isAllChecked) boxState.set(this.SELECT_ALL, true);
+    } else boxState.set(this.SELECT_ALL, false);
 
     // マップにフィルタを適用
     const checks = [];
-    state.forEach((val, key) => {
-      if (val) checks.push(key);
-    });
+    boxState.forEach((val, key) => (val ? checks.push(key) : null));
     if (this.map.loaded()) {
       const places = this.df_data_enkans
         .where((row) => checks.includes(row.JP_Common_Name))
         .getSeries("commonname")
         .distinct()
         .toArray();
-      this.map.setFilter("place", [
+      this.map.setFilter("layer-place", [
+        "in",
+        ["get", "place"],
+        ["literal", places],
+      ]);
+      this.map.setFilter("layer-place-label", [
         "in",
         ["get", "place"],
         ["literal", places],
       ]);
     }
+
+    this.setState({ checkboxPenguin: boxState });
   }
 }
 
