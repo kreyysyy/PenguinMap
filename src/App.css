@@ -50,7 +50,8 @@
   margin: 20px;
 }
 
-.map-title, .map-legend {
+.map-title,
+.map-legend {
   background-color: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   border-radius: 3px;
@@ -69,7 +70,23 @@
   text-align-last: justify;
 }
 
-.accordion {
-  width: 100% !important;
-  padding: 10% 0 !important;
+.graph-container {
+  width: 100%;
+  height: 50vh;
+  overflow-y: scroll;
+}
+
+.graph {
+  width: 100%;
+}
+
+* {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+.d-flex:not(.flex-column) > * {
+  min-width: 0;
+}
+.d-flex.flex-column > * {
+  max-width: 100%;
 }
