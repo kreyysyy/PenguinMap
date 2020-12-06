@@ -79,6 +79,7 @@ class App extends React.Component {
     // チェックボックス（ペンギン）を用意する
     checkboxPenguin = (
       <Form>
+        <Form.Label>ペンギン</Form.Label>
         {Array.from(this.state.checkboxPenguin.keys()).map((key) => {
           const checked = this.state.checkboxPenguin.get(key);
           return (
@@ -103,7 +104,7 @@ class App extends React.Component {
         (a, b) => a.properties.penguin_num - b.properties.penguin_num
       );
       graph1 = (
-        <div className="graph-container">
+        <div className="graph-container container-frame">
           <Plot
             className="graph"
             ref={(el) => (this.graph = el)}
@@ -112,6 +113,7 @@ class App extends React.Component {
                 type: "bar",
                 x: features.map((x) => x.properties.penguin_num),
                 y: features.map((y) => y.properties.place),
+                //y: features.map((y) => y.properties.place.length <= 5 ? y.properties.place : y.properties.place.substr(0,5) + "<br>" + y.properties.place.substr(5)),
                 orientation: "h",
               },
             ]}
@@ -120,8 +122,9 @@ class App extends React.Component {
               showlegend: false,
               margin: { t: 40 },
               height: 2000,
+              yaxis: { automargin: true },
             }}
-            config={{ responsive: true }}
+            config={{ responsive: true, displayModeBar: false }}
           />
         </div>
       );
@@ -143,7 +146,7 @@ class App extends React.Component {
       for (let [key, val] of penNum) penNumArray.push({ pen: key, num: val });
       penNumArray.sort((a, b) => a.num - b.num);
       graph2 = (
-        <div className="graph-container">
+        <div className="graph-container container-frame">
           <Plot
             className="graph"
             ref={(el) => (this.graph = el)}
@@ -160,8 +163,9 @@ class App extends React.Component {
               showlegend: false,
               margin: { t: 40 },
               height: 400,
+              yaxis: { automargin: true },
             }}
-            config={{ responsive: true }}
+            config={{ responsive: true, displayModeBar: false }}
           />
         </div>
       );
@@ -170,11 +174,12 @@ class App extends React.Component {
     return (
       <Container fluid>
         <Row>
-          <Col md={8}>
+          <Col md={7}>
             <div
               ref={(el) => (this.mapContainer = el)}
-              className="map-container"
+              className="map-container container-frame"
             />
+
             <div className="map-overlay">
               <div className="map-title">
                 <h5>ペンギンマップ</h5>
@@ -188,14 +193,12 @@ class App extends React.Component {
             </div>
           </Col>
           <Col md={2}>
-            <div className="responsive-plot">
-              <h5>絞り込み</h5>
+            <div className="selector-container container-frame">
               {dropdownPlace}
-              ペンギン
               {checkboxPenguin}
             </div>
           </Col>
-          <Col md={2}>
+          <Col md={3}>
             {graph1}
             {graph2}
           </Col>
