@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ペンギンマップ",
+  "name": "ペンギンがいる動物園・水族館",
   "icons": [
     {
       "src": "favicon.ico",
