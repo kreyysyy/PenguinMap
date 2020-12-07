@@ -46,8 +46,6 @@ class App extends React.Component {
   render() {
     let checkboxPenguin = null; // チェックボックス（ペンギン）
     let dropdownPlace = null; // ドロップダウンリスト（動物園・水族館名）
-    let graph1 = null; //グラフ（飼育種類数）
-    let graph2 = null; // グラフ（飼育館数）
 
     // ドロップダウンリスト（動物園・水族館）を用意する
     dropdownPlace = (
@@ -90,86 +88,6 @@ class App extends React.Component {
       </Form>
     );
 
-    // グラフ（飼育種類数）を用意する
-    const geojson = this.state.geojson;
-    if (geojson != null) {
-      const features = [...geojson.features];
-      features.sort(
-        (a, b) => a.properties.penguin_num - b.properties.penguin_num
-      );
-      graph1 = (
-        <div className="container-frame">
-          <div className="graph-container">
-            <Plot
-              className="graph"
-              ref={(el) => (this.graph = el)}
-              data={[
-                {
-                  type: "bar",
-                  x: features.map((x) => x.properties.penguin_num),
-                  y: features.map((y) => y.properties.place),
-                  orientation: "h",
-                },
-              ]}
-              layout={{
-                title: "飼育種類数",
-                showlegend: false,
-                margin: { t: 50 },
-                height: 2000,
-                xaxis: { side: "top" },
-                yaxis: { automargin: true },
-              }}
-              config={{ responsive: true, displayModeBar: false }}
-            />
-          </div>
-        </div>
-      );
-    }
-
-    // グラフ（飼育館数）を用意する
-    if (geojson != null) {
-      const features = [...geojson.features];
-      const penNum = new Map();
-      for (let f of features) {
-        let pens = f.properties.penguin.split("_");
-        for (let pen of pens) {
-          pen = pen.replace(/ペンギン$/, "");
-          if (penNum.has(pen)) penNum.set(pen, penNum.get(pen) + 1);
-          else penNum.set(pen, 0);
-        }
-      }
-      const penNumArray = [];
-      for (let [key, val] of penNum) penNumArray.push({ pen: key, num: val });
-      penNumArray.sort((a, b) => a.num - b.num);
-      graph2 = (
-        <div className="container-frame">
-          <div className="graph-container">
-            <Plot
-              className="graph"
-              ref={(el) => (this.graph = el)}
-              data={[
-                {
-                  type: "bar",
-                  x: penNumArray.map((x) => x.num),
-                  y: penNumArray.map((y) => y.pen),
-                  orientation: "h",
-                },
-              ]}
-              layout={{
-                title: "飼育館数",
-                showlegend: false,
-                margin: { t: 50 },
-                height: 400,
-                xaxis: { side: "top" },
-                yaxis: { automargin: true },
-              }}
-              config={{ responsive: true, displayModeBar: false }}
-            />
-          </div>
-        </div>
-      );
-    }
-
     return (
       <Container fluid>
         <Row>
@@ -202,8 +120,12 @@ class App extends React.Component {
             </div>
           </Col>
           <Col md={3}>
-            {graph1}
-            {graph2}
+            <GraphPenguinNumPerPlace
+              geojson={this.state.geojson}
+            ></GraphPenguinNumPerPlace>
+            <GraphPlaceNumPerPenguin
+              geojson={this.state.geojson}
+            ></GraphPlaceNumPerPenguin>
           </Col>
         </Row>
       </Container>
@@ -408,6 +330,123 @@ class App extends React.Component {
     }
 
     this.setState({ checkboxPenguin: boxState });
+  }
+}
+
+/**
+ * グラフ（飼育種類数）
+ */
+class GraphPenguinNumPerPlace extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      geojson: props.geojson,
+    };
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({ geojson: props.geojson });
+  }
+
+  render() {
+    const geojson = this.state.geojson;
+    if (geojson != null) {
+      const features = [...geojson.features];
+      features.sort(
+        (a, b) => a.properties.penguin_num - b.properties.penguin_num
+      );
+      return (
+        <div className="container-frame">
+          <div className="graph-container">
+            <Plot
+              className="graph"
+              ref={(el) => (this.graph = el)}
+              data={[
+                {
+                  type: "bar",
+                  x: features.map((x) => x.properties.penguin_num),
+                  y: features.map((y) => y.properties.place),
+                  orientation: "h",
+                },
+              ]}
+              layout={{
+                title: "飼育種類数",
+                showlegend: false,
+                margin: { t: 50 },
+                height: 2000,
+                xaxis: { side: "top" },
+                yaxis: { automargin: true },
+              }}
+              config={{ responsive: true, displayModeBar: false }}
+            />
+          </div>
+        </div>
+      );
+    } else return null;
+  }
+}
+
+/**
+ * グラフ（飼育館数）
+ */
+class GraphPlaceNumPerPenguin extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      geojson: props.geojson,
+    };
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({ geojson: props.geojson });
+  }
+
+  render() {
+    const geojson = this.state.geojson;
+    if (geojson != null) {
+      const features = [...geojson.features];
+      const penNum = new Map();
+      for (let f of features) {
+        let pens = f.properties.penguin.split("_");
+        for (let pen of pens) {
+          pen = pen.replace(/ペンギン$/, "");
+          if (penNum.has(pen)) penNum.set(pen, penNum.get(pen) + 1);
+          else penNum.set(pen, 0);
+        }
+      }
+      const penNumArray = [];
+      for (let [key, val] of penNum) penNumArray.push({ pen: key, num: val });
+      penNumArray.sort((a, b) => a.num - b.num);
+      return (
+        <div className="container-frame">
+          <div className="graph-container">
+            <Plot
+              className="graph"
+              ref={(el) => (this.graph = el)}
+              data={[
+                {
+                  type: "bar",
+                  x: penNumArray.map((x) => x.num),
+                  y: penNumArray.map((y) => y.pen),
+                  orientation: "h",
+                },
+              ]}
+              layout={{
+                title: "飼育館数",
+                showlegend: false,
+                margin: { t: 50 },
+                height: 400,
+                xaxis: { side: "top" },
+                yaxis: { automargin: true },
+              }}
+              config={{ responsive: true, displayModeBar: false }}
+            />
+          </div>
+        </div>
+      );
+    } else return null;
   }
 }
 
