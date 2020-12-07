@@ -49,5 +49,5 @@
     "eslint-plugin-react": "^7.21.5",
     "serve": "^11.3.2"
   },
-  "homepage": "https://kreyysyy.github.io/PenguinMap"
+  "homepage": "./"
 }
