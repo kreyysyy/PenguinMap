@@ -17,7 +17,7 @@ class App extends React.Component {
     this.SELECT_ALL = "＜全て＞";
 
     this.state = {
-      lng: 138,
+      lng: 136,
       lat: 37,
       zoom: 3.5,
       dropdownPlace: [],
@@ -89,7 +89,7 @@ class App extends React.Component {
     return (
       <Container fluid>
         <Row>
-          <Col md={7}>
+          <Col xs={12} sm={8} md={9} lg={5} xl={6}>
             <div className="container-frame">
               {/** マップの<div>で装飾を行うと地図上でポップアップ位置がズレるため、外側の<div>で装飾する */}
               <div
@@ -109,7 +109,7 @@ class App extends React.Component {
               </div>
             </div>
           </Col>
-          <Col md={2}>
+          <Col xs={4} sm={4} md={3} lg={3} xl={2}>
             <div className="container-frame">
               <div className="selector-container">
                 {dropdownPlace}
@@ -117,7 +117,7 @@ class App extends React.Component {
               </div>
             </div>
           </Col>
-          <Col md={3}>
+          <Col xs={8} sm={12} md={12} lg={4} xl={4}>
             <GraphPenguinNumPerPlace
               geojson={this.state.geojson}
             ></GraphPenguinNumPerPlace>
@@ -194,6 +194,11 @@ class App extends React.Component {
         ],
         glyphs: "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
       },
+      attributionControl: true,
+      customAttribution: [
+        'Map: © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+        'Data: refer to <a href="https://www.jaza.jp/" target="_blank">JAZA (2020/12/7)</a>',
+      ],
       center: [this.state.lng, this.state.lat],
       zoom: this.state.zoom,
     });
