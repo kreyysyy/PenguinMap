@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/PenguinMap/static/css/main.8f7c05bb.chunk.css",
+    "main.js": "/PenguinMap/static/js/main.af3500eb.chunk.js",
+    "main.js.map": "/PenguinMap/static/js/main.af3500eb.chunk.js.map",
+    "runtime-main.js": "/PenguinMap/static/js/runtime-main.6402b73b.js",
+    "runtime-main.js.map": "/PenguinMap/static/js/runtime-main.6402b73b.js.map",
+    "static/css/2.1a02f21c.chunk.css": "/PenguinMap/static/css/2.1a02f21c.chunk.css",
+    "static/js/2.448a38e3.chunk.js": "/PenguinMap/static/js/2.448a38e3.chunk.js",
+    "static/js/2.448a38e3.chunk.js.map": "/PenguinMap/static/js/2.448a38e3.chunk.js.map",
+    "static/js/3.53b03668.chunk.js": "/PenguinMap/static/js/3.53b03668.chunk.js",
+    "static/js/3.53b03668.chunk.js.map": "/PenguinMap/static/js/3.53b03668.chunk.js.map",
+    "index.html": "/PenguinMap/index.html",
+    "static/css/2.1a02f21c.chunk.css.map": "/PenguinMap/static/css/2.1a02f21c.chunk.css.map",
+    "static/css/main.8f7c05bb.chunk.css.map": "/PenguinMap/static/css/main.8f7c05bb.chunk.css.map",
+    "static/js/2.448a38e3.chunk.js.LICENSE.txt": "/PenguinMap/static/js/2.448a38e3.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.6402b73b.js",
+    "static/css/2.1a02f21c.chunk.css",
+    "static/js/2.448a38e3.chunk.js",
+    "static/css/main.8f7c05bb.chunk.css",
+    "static/js/main.af3500eb.chunk.js"
+  ]
+}
