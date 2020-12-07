@@ -6,14 +6,11 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import mapboxgl from "mapbox-gl"; // or "const mapboxgl = require('mapbox-gl');"
-import * as dataForge from "data-forge";
 import Plot from "react-plotly.js";
 
 mapboxgl.accessToken =
   "pk.eyJ1Ijoid2FxdXR0cm8iLCJhIjoiY2thN3FicnkzMDZwcjJycWQzNTBuYW5tOSJ9.5cuZ0Th6f_KjECCIyvGANg";
 const FILE_GeoJSON = "./Place_PenguinList.geojson";
-const FILE_enkan_latlon = "./enkan_latlon_GSI.csv";
-const FILE_data_enkans = "./JAZA_data_enkans.csv";
 
 class App extends React.Component {
   constructor(props) {
@@ -43,10 +40,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.createMap();
-    // ファイル読み込み
     this.readGeoJSON();
-    this.read_enkan_latlon();
-    this.read_data_enkans();
   }
 
   render() {
@@ -104,28 +98,30 @@ class App extends React.Component {
         (a, b) => a.properties.penguin_num - b.properties.penguin_num
       );
       graph1 = (
-        <div className="graph-container container-frame">
-          <Plot
-            className="graph"
-            ref={(el) => (this.graph = el)}
-            data={[
-              {
-                type: "bar",
-                x: features.map((x) => x.properties.penguin_num),
-                y: features.map((y) => y.properties.place),
-                //y: features.map((y) => y.properties.place.length <= 5 ? y.properties.place : y.properties.place.substr(0,5) + "<br>" + y.properties.place.substr(5)),
-                orientation: "h",
-              },
-            ]}
-            layout={{
-              title: "飼育種類数",
-              showlegend: false,
-              margin: { t: 40 },
-              height: 2000,
-              yaxis: { automargin: true },
-            }}
-            config={{ responsive: true, displayModeBar: false }}
-          />
+        <div className="container-frame">
+          <div className="graph-container">
+            <Plot
+              className="graph"
+              ref={(el) => (this.graph = el)}
+              data={[
+                {
+                  type: "bar",
+                  x: features.map((x) => x.properties.penguin_num),
+                  y: features.map((y) => y.properties.place),
+                  orientation: "h",
+                },
+              ]}
+              layout={{
+                title: "飼育種類数",
+                showlegend: false,
+                margin: { t: 50 },
+                height: 2000,
+                xaxis: { side: "top" },
+                yaxis: { automargin: true },
+              }}
+              config={{ responsive: true, displayModeBar: false }}
+            />
+          </div>
         </div>
       );
     }
@@ -146,27 +142,30 @@ class App extends React.Component {
       for (let [key, val] of penNum) penNumArray.push({ pen: key, num: val });
       penNumArray.sort((a, b) => a.num - b.num);
       graph2 = (
-        <div className="graph-container container-frame">
-          <Plot
-            className="graph"
-            ref={(el) => (this.graph = el)}
-            data={[
-              {
-                type: "bar",
-                x: penNumArray.map((x) => x.num),
-                y: penNumArray.map((y) => y.pen),
-                orientation: "h",
-              },
-            ]}
-            layout={{
-              title: "飼育館数",
-              showlegend: false,
-              margin: { t: 40 },
-              height: 400,
-              yaxis: { automargin: true },
-            }}
-            config={{ responsive: true, displayModeBar: false }}
-          />
+        <div className="container-frame">
+          <div className="graph-container">
+            <Plot
+              className="graph"
+              ref={(el) => (this.graph = el)}
+              data={[
+                {
+                  type: "bar",
+                  x: penNumArray.map((x) => x.num),
+                  y: penNumArray.map((y) => y.pen),
+                  orientation: "h",
+                },
+              ]}
+              layout={{
+                title: "飼育館数",
+                showlegend: false,
+                margin: { t: 50 },
+                height: 400,
+                xaxis: { side: "top" },
+                yaxis: { automargin: true },
+              }}
+              config={{ responsive: true, displayModeBar: false }}
+            />
+          </div>
         </div>
       );
     }
@@ -175,27 +174,31 @@ class App extends React.Component {
       <Container fluid>
         <Row>
           <Col md={7}>
-            <div
-              ref={(el) => (this.mapContainer = el)}
-              className="map-container container-frame"
-            />
-
-            <div className="map-overlay">
-              <div className="map-title">
-                <h5>ペンギンマップ</h5>
-                ペンギンがいる動物園・水族館
-              </div>
-              <div id="legend" className="map-legend">
-                飼育されているペンギンの種類数
-                <div className="map-legend-bar"></div>
-                <div className="map-legend-bar-text">1 8</div>
+            <div className="container-frame">
+              {/** マップの<div>で装飾を行うと地図上でポップアップ位置がズレるため、外側の<div>で装飾する */}
+              <div
+                ref={(el) => (this.mapContainer = el)}
+                className="map-container"
+              />
+              <div className="map-overlay">
+                <div className="map-title">
+                  <h5>ペンギンマップ</h5>
+                  ペンギンがいる動物園・水族館
+                </div>
+                <div id="legend" className="map-legend">
+                  飼育されているペンギンの種類数
+                  <div className="map-legend-bar"></div>
+                  <div className="map-legend-bar-text">1 8</div>
+                </div>
               </div>
             </div>
           </Col>
           <Col md={2}>
-            <div className="selector-container container-frame">
-              {dropdownPlace}
-              {checkboxPenguin}
+            <div className="container-frame">
+              <div className="selector-container">
+                {dropdownPlace}
+                {checkboxPenguin}
+              </div>
             </div>
           </Col>
           <Col md={3}>
@@ -215,49 +218,30 @@ class App extends React.Component {
     const geojson = await response.json();
     console.log("read file: " + FILE_GeoJSON);
 
-    this.setState({ geojson: geojson });
-  }
+    // 動物園・水族館の配列
+    const places = Array.from(
+      new Set(geojson.features.map((x) => x.properties.place))
+    ).sort();
 
-  /**
-   * CSVファイルをデータフレームに読み込む
-   */
-  async read_enkan_latlon() {
-    const response = await fetch(FILE_enkan_latlon);
-    const text = await response.text();
-    this.df_enkan_latlon = dataForge.fromCSV(text);
-    console.log("read file: " + FILE_enkan_latlon);
-
-    // 場所のリストを作成
-    this.places = this.df_enkan_latlon
-      .getSeries("commonname")
-      .distinct()
-      .toArray();
-
-    // ドロップダウンリストの状態を初期化
-    this.setState({ dropdownPlace: [this.SELECT_ALL, ...this.places] });
-    this.setState({ dropdownPlaceSelected: this.SELECT_ALL });
-  }
-
-  /**
-   * CSVファイルをデータフレームに読み込む
-   */
-  async read_data_enkans() {
-    const response = await fetch(FILE_data_enkans);
-    const text = await response.text();
-    this.df_data_enkans = dataForge.fromCSV(text);
-    console.log("read file: " + FILE_data_enkans);
-
-    // ペンギンのリストを作成
-    this.penguins = this.df_data_enkans
-      .getSeries("JP_Common_Name")
-      .distinct()
-      .toArray();
+    // ペンギンの配列
+    const set = new Set();
+    for (let f of geojson.features)
+      for (let p of f.properties.penguin.split("_")) set.add(p);
+    const penguins = Array.from(set).sort();
 
     // チェックボックスの状態を初期化
     const box = new Map();
     box.set(this.SELECT_ALL, true);
-    for (let penguin of this.penguins) box.set(penguin, true);
-    this.setState({ checkboxPenguin: box });
+    for (let penguin of penguins) box.set(penguin, true);
+
+    this.setState({
+      geojson: geojson,
+      // ドロップダウンリストの状態を初期化
+      dropdownPlace: [this.SELECT_ALL, ...places],
+      dropdownPlaceSelected: this.SELECT_ALL,
+      // チェックボックスの状態を初期化
+      checkboxPenguin: box,
+    });
   }
 
   /**

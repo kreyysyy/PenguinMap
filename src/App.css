@@ -1,11 +1,11 @@
 .map-container {
-  height: calc(100vh - 10px - 5px);
+  height: calc(100vh - 45px);
 }
 
 .map-overlay {
-  font: 12px/20px "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-size: 12px;
   position: absolute;
-  width: 25%;
+  width: 220px;
   top: 0;
   left: 0;
   margin: 20px;
@@ -32,24 +32,25 @@
 }
 
 .container-frame {
+  position: relative;
   border-top: solid 5px #5d627b;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
-  margin-top: 10px;
+  margin: 10px;
   padding: 10px;
 }
 
-.selector-container{
+.selector-container {
   width: 100%;
-  height: calc(100vh - 10px - 5px);
+  height: calc(100vh - 45px);
   overflow-y: auto;
 }
 
 .graph-container {
   width: 100%;
-  height: calc(50vh - 10px - 5px);
+  height: calc(50vh - 45px);
   overflow-y: auto;
 }
 
 .graph {
-  width: 100%;
+  width: calc(100% - 20px);
 }
