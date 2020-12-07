@@ -192,7 +192,7 @@ class App extends React.Component {
             //maxzoom: 18,
           },
         ],
-        glyphs: "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+        glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
       },
       attributionControl: true,
       customAttribution: [
