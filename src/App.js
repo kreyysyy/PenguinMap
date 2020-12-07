@@ -8,8 +8,6 @@ import Form from "react-bootstrap/Form";
 import mapboxgl from "mapbox-gl"; // or "const mapboxgl = require('mapbox-gl');"
 import Plot from "react-plotly.js";
 
-mapboxgl.accessToken =
-  "pk.eyJ1Ijoid2FxdXR0cm8iLCJhIjoiY2thN3FicnkzMDZwcjJycWQzNTBuYW5tOSJ9.5cuZ0Th6f_KjECCIyvGANg";
 const FILE_GeoJSON = "./Place_PenguinList.geojson";
 
 class App extends React.Component {
@@ -172,7 +170,30 @@ class App extends React.Component {
   createMap() {
     this.map = new mapboxgl.Map({
       container: this.mapContainer,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: {
+        version: 8,
+        sources: {
+          OSM: {
+            type: "raster",
+            tiles: [
+              "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            ],
+            tileSize: 256,
+          },
+        },
+        layers: [
+          {
+            id: "OSM",
+            type: "raster",
+            source: "OSM",
+            //minzoom: 0,
+            //maxzoom: 18,
+          },
+        ],
+        glyphs: "http://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+      },
       center: [this.state.lng, this.state.lat],
       zoom: this.state.zoom,
     });
@@ -212,6 +233,7 @@ class App extends React.Component {
           "text-field": ["format", ["get", "place"]],
           "text-anchor": "bottom",
           "text-radial-offset": 0.7,
+          "text-font": ["Open Sans Regular"],
         },
         paint: {
           "text-halo-width": 2,
