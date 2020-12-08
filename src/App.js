@@ -35,8 +35,9 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.createMap();
-    this.readGeoJSON();
+    this.readGeoJSON().then(() => {
+      this.createMap();
+    });
   }
 
   render() {
