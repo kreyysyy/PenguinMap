@@ -20,6 +20,7 @@ class App extends React.Component {
       lng: 136,
       lat: 37,
       zoom: 3.5,
+      penguinNumMin: 0,
       penguinNumMax: 0,
       dropdownPlace: [],
       dropdownPlaceSelected: this.SELECT_ALL,
@@ -104,7 +105,7 @@ class App extends React.Component {
                   <table className="map-legend-bar-text">
                     <tbody>
                       <tr>
-                        <td align="left">1</td>
+                        <td align="left">{this.state.penguinNumMin}</td>
                         <td align="right">{this.state.penguinNumMax}</td>
                       </tr>
                     </tbody>
@@ -145,6 +146,9 @@ class App extends React.Component {
     const penguinNumMax = geojson.features
       .map((x) => x.properties.penguin_num)
       .reduce((a, b) => Math.max(a, b));
+    const penguinNumMin = geojson.features
+      .map((x) => x.properties.penguin_num)
+      .reduce((a, b) => Math.min(a, b));
 
     // 動物園・水族館の配列
     const places = Array.from(
@@ -164,6 +168,7 @@ class App extends React.Component {
 
     this.setState({
       geojson: geojson,
+      penguinNumMin: penguinNumMin,
       penguinNumMax: penguinNumMax,
       // ドロップダウンリストの状態を初期化
       dropdownPlace: [this.SELECT_ALL, ...places],
@@ -230,9 +235,9 @@ class App extends React.Component {
             "interpolate",
             ["linear"],
             ["get", "penguin_num"],
-            1,
+            this.state.penguinNumMin,
             "blue",
-            this.state.penguinNumMax / 2.0,
+            (this.state.penguinNumMax - this.state.penguinNumMin) / 2.0,
             "yellow",
             this.state.penguinNumMax,
             "red",
