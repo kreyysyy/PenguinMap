@@ -27,10 +27,6 @@ class App extends React.Component {
     };
 
     this.map = null;
-    this.df_enkan_latlon = null;
-    this.df_data_enkans = null;
-    this.penguins = null;
-    this.places = null;
 
     this.checkboxPenguinChanged = this.checkboxPenguinChanged.bind(this);
     this.dropdownPlaceChanged = this.dropdownPlaceChanged.bind(this);
@@ -104,7 +100,14 @@ class App extends React.Component {
                 <div id="legend" className="map-legend">
                   飼育されているペンギンの種類数
                   <div className="map-legend-bar"></div>
-                  <div className="map-legend-bar-text">1 8</div>
+                  <table className="map-legend-bar-text">
+                    <tbody>
+                      <tr>
+                        <td align="left">1</td>
+                        <td align="right">8</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -336,14 +339,14 @@ class App extends React.Component {
     } else boxState.set(this.SELECT_ALL, false);
 
     // マップにフィルタを適用
-    const checks = [];
-    boxState.forEach((val, key) => (val ? checks.push(key) : null));
+    const placeSet = new Set();
+    for (let [key, val] of boxState)
+      if (val)
+        for (let f of this.state.geojson.features)
+          if (f.properties.penguin.includes(key))
+            placeSet.add(f.properties.place);
+    const places = Array.from(placeSet);
     if (this.map.loaded()) {
-      const places = this.df_data_enkans
-        .where((row) => checks.includes(row.JP_Common_Name))
-        .getSeries("commonname")
-        .distinct()
-        .toArray();
       this.map.setFilter("layer-place", [
         "in",
         ["get", "place"],
