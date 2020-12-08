@@ -20,6 +20,7 @@ class App extends React.Component {
       lng: 136,
       lat: 37,
       zoom: 3.5,
+      penguinNumMax: 0,
       dropdownPlace: [],
       dropdownPlaceSelected: this.SELECT_ALL,
       checkboxPenguin: new Map().set(this.SELECT_ALL, true),
@@ -104,7 +105,7 @@ class App extends React.Component {
                     <tbody>
                       <tr>
                         <td align="left">1</td>
-                        <td align="right">8</td>
+                        <td align="right">{this.state.penguinNumMax}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -141,6 +142,10 @@ class App extends React.Component {
     const geojson = await response.json();
     console.log("read file: " + FILE_GeoJSON);
 
+    const penguinNumMax = geojson.features
+      .map((x) => x.properties.penguin_num)
+      .reduce((a, b) => Math.max(a, b));
+
     // 動物園・水族館の配列
     const places = Array.from(
       new Set(geojson.features.map((x) => x.properties.place))
@@ -159,6 +164,7 @@ class App extends React.Component {
 
     this.setState({
       geojson: geojson,
+      penguinNumMax: penguinNumMax,
       // ドロップダウンリストの状態を初期化
       dropdownPlace: [this.SELECT_ALL, ...places],
       dropdownPlaceSelected: this.SELECT_ALL,
@@ -226,9 +232,9 @@ class App extends React.Component {
             ["get", "penguin_num"],
             1,
             "blue",
-            4.5,
+            this.state.penguinNumMax / 2.0,
             "yellow",
-            8,
+            this.state.penguinNumMax,
             "red",
           ],
         },
