@@ -410,6 +410,9 @@ class GraphPenguinNumPerPlace extends React.Component {
                   x: features.map((x) => x.properties.penguin_num),
                   y: features.map((y) => y.properties.place),
                   orientation: "h",
+                  text: features.map((x) => x.properties.penguin_num),
+                  textposition: "outside",
+                  hoverinfo: "x+y",
                 },
               ]}
               layout={{
@@ -419,6 +422,7 @@ class GraphPenguinNumPerPlace extends React.Component {
                 height: 2000,
                 xaxis: { side: "top" },
                 yaxis: { automargin: true },
+                dragmode: false,
               }}
               config={{ responsive: true, displayModeBar: false }}
             />
@@ -478,15 +482,18 @@ class GraphPlaceNumPerPenguin extends React.Component {
                   x: penNumArray.map((x) => x.num),
                   y: penNumArray.map((y) => y.pen),
                   orientation: "h",
+                  text: penNumArray.map((y) => y.num),
+                  textposition: "outside",
+                  hoverinfo: "x+y",
                 },
               ]}
               layout={{
                 title: "飼育館数",
-                showlegend: false,
                 margin: { t: 50 },
                 height: 400,
                 xaxis: { side: "top" },
                 yaxis: { automargin: true },
+                dragmode: false,
               }}
               config={{ responsive: true, displayModeBar: false }}
             />
