@@ -448,19 +448,24 @@ class GraphPlaceNumPerPenguin extends React.Component {
   render() {
     const geojson = this.state.geojson;
     if (geojson != null) {
-      const features = [...geojson.features];
+      const features = geojson.features;
+
+      // JSON内の各ペンギンをカウント
       const penNum = new Map();
       for (let f of features) {
         let pens = f.properties.penguin.split("_");
         for (let pen of pens) {
           pen = pen.replace(/ペンギン$/, "");
           if (penNum.has(pen)) penNum.set(pen, penNum.get(pen) + 1);
-          else penNum.set(pen, 0);
+          else penNum.set(pen, 1);
         }
       }
+
+      // グラフ用に配列に変換
       const penNumArray = [];
       for (let [key, val] of penNum) penNumArray.push({ pen: key, num: val });
       penNumArray.sort((a, b) => a.num - b.num);
+
       return (
         <div className="container-frame">
           <div className="graph-container">
